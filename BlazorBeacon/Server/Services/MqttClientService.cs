@@ -28,18 +28,21 @@ namespace BlazorBeacon.Server.Services
             //mqttClient.UseConnectedHandler((arg) => Console.WriteLine("Establish connection " + arg.ConnectResult.ResultCode));
 
             await mqttClient.StartAsync(options);
-            if (gateway is not null && gateway.Beacons.Any())
+            _cacheService.CachedBeacons.Clear();
+            while(_cacheService.CachedBeacons.Count < 5)
             {
-                foreach (var beacon in gateway.Beacons)
+                if (gateway is not null && gateway.Beacons.Any())
                 {
-                    var distance = CalculateAccuracy(beacon.TxPower, beacon.Rssi);
-                    if (_cacheService.CachedBeacons is not null)
+                    foreach (var beacon in gateway.Beacons)
                     {
-                        _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = DateTimeOffset.UtcNow, Mac = beacon.Mac, Distance = distance.ToString("F"), GwMac = gateway.Mac, GwTopic = gateway.Topic });
+                        var distance = CalculateAccuracy(beacon.TxPower, beacon.Rssi);
+                        if (_cacheService.CachedBeacons is not null)
+                        {
+                            _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = DateTimeOffset.UtcNow, Mac = beacon.Mac, Distance = distance.ToString("F"), GwMac = gateway.Mac, GwTopic = gateway.Topic });
+                        }
                     }
                 }
             }
-
             await mqttClient.StopAsync();
         }
 
