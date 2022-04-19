@@ -17,7 +17,7 @@ namespace BlazorBeacon.Server.Services
         {
             _cacheService = cacheService;
         }
-        public async Task GetData(string topic)
+        public async Task GetGatewayDataByTopic(string topic)
         {
             var options = TcpMqttClientOptions("mqtt.bconimg.com");
             var mqttClient = new MqttFactory().CreateManagedMqttClient();
@@ -28,18 +28,14 @@ namespace BlazorBeacon.Server.Services
             //mqttClient.UseConnectedHandler((arg) => Console.WriteLine("Establish connection " + arg.ConnectResult.ResultCode));
 
             await mqttClient.StartAsync(options);
-
-            while (true)
+            if (gateway is not null && gateway.Beacons.Any())
             {
-                if (gateway is not null && gateway.Beacons.Count > 0)
+                foreach (var beacon in gateway.Beacons)
                 {
-                    foreach (var beacon in gateway.Beacons)
+                    var distance = CalculateAccuracy(beacon.TxPower, beacon.Rssi);
+                    if (_cacheService.CachedBeacons is not null)
                     {
-                        var distance = CalculateAccuracy(beacon.TxPower, beacon.Rssi);
-                        if (_cacheService.CachedBeacons is not null)
-                        {
-                            _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = DateTimeOffset.UtcNow, Mac = beacon.Mac, Distance = distance.ToString("F"), GatewayMac = gateway.Mac });
-                        }
+                        _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = DateTimeOffset.UtcNow, Mac = beacon.Mac, Distance = distance.ToString("F"), GwMac = gateway.Mac, GwTopic = gateway.Topic });
                     }
                 }
             }
@@ -65,31 +61,34 @@ namespace BlazorBeacon.Server.Services
         private void MqttClient_ApplicationMessageReceived(MqttApplicationMessageReceivedEventArgs e)
         {
             var gw = MessagePackSerializer.Deserialize<MpGateway>(e.ApplicationMessage.Payload);
-            var beacons = new List<Beacon>();
-            foreach (var device in gw.devices)
+            if (gw is not null && gw.devices.Any())
             {
-                beacons.Add(new Beacon
+                var beacons = new List<Beacon>();
+
+                foreach (var device in gw.devices)
                 {
-                    Adv = device[0].ToString("X2"),
-                    Mac = BitConverter.ToString(device.Skip(1).Take(6).ToArray()),
-                    Rssi = int.Parse((device[7] - 256).ToString()),
-                    Uuid = BitConverter.ToString(device.Skip(18).Take(16).ToArray()),
-                    Major = BitConverter.ToString(device.Skip(34).Take(2).ToArray()),
-                    Minor = BitConverter.ToString(device.Skip(36).Take(2).ToArray()),
-                    TxPower = int.Parse((device[37] - 256).ToString())
-                });
+                    beacons.Add(new Beacon
+                    {
+                        Adv = device[0].ToString("X2"),
+                        Mac = BitConverter.ToString(device.Skip(1).Take(6).ToArray()),
+                        Rssi = int.Parse((device[7] - 256).ToString()),
+                        Uuid = BitConverter.ToString(device.Skip(18).Take(16).ToArray()),
+                        Major = BitConverter.ToString(device.Skip(34).Take(2).ToArray()),
+                        Minor = BitConverter.ToString(device.Skip(36).Take(2).ToArray()),
+                        TxPower = int.Parse((device[37] - 256).ToString())
+                    });
+                }
+
+                gateway = new Gateway
+                {
+                    TimeStamp = DateTimeOffset.UtcNow,
+                    Topic = e.ApplicationMessage.Topic,
+                    Version = gw.v,
+                    Mac = string.Join("-", Regex.Split(gw.mac, @"(?<=\G.{" + 2 + "})(?!$)")),
+                    Ip = gw.ip,
+                    Beacons = beacons
+                };
             }
-
-            gateway = new Gateway
-            {
-                TimeStamp = DateTimeOffset.UtcNow,
-                Topic = e.ApplicationMessage.Topic,
-                Version = gw.v,
-                Mac = string.Join("-", Regex.Split(gw.mac, @"(?<=\G.{" + 2 + "})(?!$)")),
-                Ip = gw.ip,
-                Beacons = beacons
-            };
-
         }
 
         private static double CalculateAccuracy(int txPower, double rssi)

@@ -16,14 +16,14 @@
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(3));
             return Task.CompletedTask;
         }
 
         private void DoWork(object? state)
         {
             //var ar = new string[] { "FB-A7-DC-2C-E8-3E" };
-            Task.Run(async () => await _mqttClientService.GetData("ppku"));
+            Task.Run(async () => await _mqttClientService.GetGatewayDataByTopic("ppku"));
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

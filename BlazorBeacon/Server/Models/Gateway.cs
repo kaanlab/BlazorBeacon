@@ -13,6 +13,6 @@ namespace BlazorBeacon.Server.Models
         public string Version { get; set; }
         public string Ip { get; set; }
         public string Mac { get; set; }
-        public List<Beacon> Beacons { get; set; }
+        public IEnumerable<Beacon> Beacons { get; set; }
     }
 }
