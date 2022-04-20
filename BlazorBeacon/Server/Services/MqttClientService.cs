@@ -1,6 +1,7 @@
 ﻿using BlazorBeacon.Server.Models;
 using MessagePack;
 using MQTTnet;
+using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Receiving;
 using MQTTnet.Extensions.ManagedClient;
@@ -12,6 +13,7 @@ namespace BlazorBeacon.Server.Services
     {
         private readonly ICacheService _cacheService;
         private Gateway gateway;
+       // MqttClientConnectResultCode resultCode;
 
         public MqttClientService(ICacheService cacheService)
         {
@@ -25,11 +27,16 @@ namespace BlazorBeacon.Server.Services
             await mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
             mqttClient.UseApplicationMessageReceivedHandler(new MqttApplicationMessageReceivedHandlerDelegate(e => MqttClient_ApplicationMessageReceived(e)));
 
-            //mqttClient.UseConnectedHandler((arg) => Console.WriteLine("Establish connection " + arg.ConnectResult.ResultCode));
+            //mqttClient.UseConnectedHandler(arg => resultCode = arg.ConnectResult.ResultCode);
 
             await mqttClient.StartAsync(options);
+
+            //var a = resultCode;
+            
+
             _cacheService.CachedBeacons.Clear();
-            while(_cacheService.CachedBeacons.Count < 5)
+            var timeStamp = DateTimeOffset.Now;
+            while (_cacheService.CachedBeacons.Count < 6)
             {
                 if (gateway is not null && gateway.Beacons.Any())
                 {
@@ -38,7 +45,7 @@ namespace BlazorBeacon.Server.Services
                         var distance = CalculateAccuracy(beacon.TxPower, beacon.Rssi);
                         if (_cacheService.CachedBeacons is not null)
                         {
-                            _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = DateTimeOffset.UtcNow, Mac = beacon.Mac, Distance = distance.ToString("F"), GwMac = gateway.Mac, GwTopic = gateway.Topic });
+                            _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = timeStamp, Mac = beacon.Mac, Distance = distance.ToString("F"), GwMac = gateway.Mac, GwTopic = gateway.Topic });
                         }
                     }
                 }

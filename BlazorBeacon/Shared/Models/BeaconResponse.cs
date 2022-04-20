@@ -12,5 +12,6 @@ namespace BlazorBeacon.Shared.Models
         public string Distance { get; set; }
         public string GwTopic { get; set; }
         public string GwMac { get; set; }
+        public DateTimeOffset TimeStamp { get; set; }
     }
 }
