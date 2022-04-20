@@ -14,9 +14,9 @@ namespace BlazorBeacon.Server.Controllers
         }
 
         [HttpGet("number/{number}")]
-        public ActionResult<IEnumerable<Classroom>> GetByNumber(string number)
+        public ActionResult<Classroom> GetByNumber(string number)
         {
-            return Ok(GetClassrooms().Where(x => x.Cabinet.Equals(number, StringComparison.InvariantCultureIgnoreCase)));
+            return Ok(GetClassrooms().FirstOrDefault(x => x.Cabinet.Equals(number, StringComparison.InvariantCultureIgnoreCase)));
         }
 
         private static IEnumerable<Classroom> GetClassrooms()

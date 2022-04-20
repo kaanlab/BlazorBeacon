@@ -8,6 +8,7 @@
 {
     <MudTable Items="@listOfBeacons" Hover="true" Class="my-5">
         <ToolBarContent>
+            <MudIconButton Icon="@Icons.Filled.Refresh" Color="Color.Primary" Size="Size.Large" OnClick="@(async () => await Refresh())" Class="mr-3" />
             <MudText Typo="Typo.h6">В ожидании</MudText>
         </ToolBarContent>
         <HeaderContent>
@@ -71,11 +72,23 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var beaconResponses = await httpClient.GetFromJsonAsync<BeaconResponse[]>("api/gateways/gw/77-88-99-00-11-22");
-        listOfBeacons = beaconResponses.ToList();
-
+        await Refresh();
         classroom = await httpClient.GetFromJsonAsync<Classroom>("api/classrooms/number/202");
 
+    }
+
+    private async Task Refresh()
+    {
+        var beaconResponses = await httpClient.GetFromJsonAsync<BeaconResponse[]>("api/gateways/gw/8C-AA-B5-97-E1-FC");
+        var draft = beaconResponses.ToList();
+        if(listOfStudentsInClass.Any())
+        {
+            foreach (var item in listOfStudentsInClass)
+            {
+                draft.RemoveAll(x => x.Mac.Equals(item.Mac, StringComparison.InvariantCultureIgnoreCase));
+            }
+        }
+        listOfBeacons = draft;
     }
 
     private void AddToClass(BeaconResponse context)

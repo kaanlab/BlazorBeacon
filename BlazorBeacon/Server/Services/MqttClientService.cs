@@ -45,12 +45,14 @@ namespace BlazorBeacon.Server.Services
                         var distance = CalculateAccuracy(beacon.TxPower, beacon.Rssi);
                         if (_cacheService.CachedBeacons is not null)
                         {
-                            _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = timeStamp, Mac = beacon.Mac, Distance = distance.ToString("F"), GwMac = gateway.Mac, GwTopic = gateway.Topic });
+                            _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = timeStamp, Mac = beacon.Mac, Distance = distance, GwMac = gateway.Mac, GwTopic = gateway.Topic });
                         }
                     }
                 }
             }
-            await mqttClient.StopAsync();
+
+            // stop responce if uncomment. TODO: neet to fix!
+            //await mqttClient.StopAsync();
         }
 
         private static ManagedMqttClientOptions TcpMqttClientOptions(string url)

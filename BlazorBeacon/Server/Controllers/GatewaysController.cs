@@ -38,15 +38,18 @@ namespace BlazorBeacon.Server.Controllers
 
             //return Ok(ToBeaconResponseModel(beacons));
             List<CachedBeacon> cachedList = new List<CachedBeacon>();
-            var cachedBeacons = GetBeacons();
-            var groupedBeacons = cachedBeacons.Where(x => x.GwMac.Equals(mac, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(x => x.TimeStamp).GroupBy(x => x.Mac);
-            foreach (var beacon in groupedBeacons)
+            var cachedBeacons = _cacheService.CachedBeacons; //GetBeacons();
+            var groupedBeacons = cachedBeacons.Where(x => x.GwMac.Equals(mac, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(x => x.TimeStamp).GroupBy(x => x.Mac).ToArray();
+            foreach (var beacons in groupedBeacons)
             {
-                cachedList.Add(beacon.FirstOrDefault());
+                var aver = beacons.Average(x => x.Distance);
+                var beacon = beacons.FirstOrDefault();
+                beacon.Distance = aver;
+                cachedList.Add(beacon);
             }
 
             var students = GetStudents();
-            var response = cachedList.Join(students, b => b.Mac, s => s.BeaconMac, (b, s) => new BeaconResponse { TimeStamp = b.TimeStamp, Distance = b.Distance, GwMac = b.GwMac, Mac = b.Mac, GwTopic = b.GwTopic, StudentClass = s.Class, StudentName = s.Name });
+            var response = cachedList.Join(students, b => b.Mac, s => s.BeaconMac, (b, s) => new BeaconResponse { TimeStamp = b.TimeStamp, Distance = b.Distance.ToString("F"), GwMac = b.GwMac, Mac = b.Mac, GwTopic = b.GwTopic, StudentClass = s.Class, StudentName = s.Name });
             
             return Ok(response);
         }
@@ -60,11 +63,11 @@ namespace BlazorBeacon.Server.Controllers
             //    .Take(10);
 
             //return Ok(ToBeaconResponseModel(beacons));
-            var cachedBeacons = GetBeacons();
+            var cachedBeacons = _cacheService.CachedBeacons; // GetBeacons();
             var filteredBeacons =  cachedBeacons.Where(x => x.Mac.Equals(mac, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(x => x.TimeStamp);
 
             var students = GetStudents();
-            var response = filteredBeacons.Join(students, b => b.Mac, s => s.BeaconMac, (b, s) => new BeaconResponse { TimeStamp = b.TimeStamp, Distance = b.Distance, GwMac = b.GwMac, Mac = b.Mac, GwTopic = b.GwTopic, StudentClass = s.Class, StudentName = s.Name });
+            var response = filteredBeacons.Join(students, b => b.Mac, s => s.BeaconMac, (b, s) => new BeaconResponse { TimeStamp = b.TimeStamp, Distance = b.Distance.ToString("F"), GwMac = b.GwMac, Mac = b.Mac, GwTopic = b.GwTopic, StudentClass = s.Class, StudentName = s.Name });
 
             return Ok(response);
 
@@ -77,7 +80,7 @@ namespace BlazorBeacon.Server.Controllers
                 yield return new BeaconResponse
                 {
                     Mac = beacon.Mac,
-                    Distance = beacon.Distance,
+                    Distance = beacon.Distance.ToString("F"),
                     GwTopic = beacon.GwTopic,
                     GwMac = beacon.GwMac,
                     TimeStamp = beacon.TimeStamp
@@ -92,10 +95,10 @@ namespace BlazorBeacon.Server.Controllers
 
             return new List<CachedBeacon>()
             {
-                new CachedBeacon { Mac = "11-22-33-44-55-66", GwTopic = "gp1/202", Distance = "1.1", GwMac = "77-88-99-00-11-22", TimeStamp = timeStamp },
-                new CachedBeacon { Mac = "66-55-44-33-22-11", GwTopic = "gp1/250", Distance = "2.0", GwMac = "33-44-55-66-77-88", TimeStamp = timeStamp },
-                new CachedBeacon { Mac = "11-22-33-44-55-66", GwTopic = "gp1/202", Distance = "2.2", GwMac = "77-88-99-00-11-22", TimeStamp = timeStamp2 },
-                new CachedBeacon { Mac = "66-55-44-33-22-11", GwTopic = "gp1/250", Distance = "0.5", GwMac = "33-44-55-66-77-88", TimeStamp = timeStamp2 },
+                new CachedBeacon { Mac = "E9-E1-79-33-78-8F", GwTopic = "gp1/202", Distance = 1.1, GwMac = "8C-AA-B5-97-E1-FC", TimeStamp = timeStamp },
+                new CachedBeacon { Mac = "FE-BB-DE-77-08-D5", GwTopic = "gp1/250", Distance = 2.0, GwMac = "33-44-55-66-77-88", TimeStamp = timeStamp },
+                new CachedBeacon { Mac = "E9-E1-79-33-78-8F", GwTopic = "gp1/202", Distance = 2.2, GwMac = "8C-AA-B5-97-E1-FC", TimeStamp = timeStamp2 },
+                new CachedBeacon { Mac = "FE-BB-DE-77-08-D5", GwTopic = "gp1/250", Distance = 0.5, GwMac = "33-44-55-66-77-88", TimeStamp = timeStamp2 },
             };
         }
 
@@ -104,8 +107,8 @@ namespace BlazorBeacon.Server.Controllers
 
             return new List<Student>()
             {
-                new Student { BeaconMac = "11-22-33-44-55-66", Name = "Иванов И.И.", Class = "5А" },
-                new Student { BeaconMac = "66-55-44-33-22-11", Name = "Петров П.П.", Class = "6Б" },
+                new Student { BeaconMac = "E9-E1-79-33-78-8F", Name = "Иванов И.И.", Class = "5А" },
+                new Student { BeaconMac = "FE-BB-DE-77-08-D5", Name = "Петров П.П.", Class = "6Б" },
             };
         }
     }
