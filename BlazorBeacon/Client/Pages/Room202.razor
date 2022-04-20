@@ -1,26 +1,28 @@
-﻿@page "/room202"
+﻿@page "/classroom202"
 
 @inject HttpClient httpClient
 
-<h3>Room202</h3>
+<h3>Учебный кабинет 202</h3>
 
 @if (listOfBeacons is not null)
 {
-     <MudTable Items="@listOfBeacons" Hover="true" Class="my-5">
+    <MudTable Items="@listOfBeacons" Hover="true" Class="my-5">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Коренные малочисленые народы</MudText>
+            <MudText Typo="Typo.h6">В ожидании</MudText>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Мак</MudTh>
+            <MudTh>Имя ученика</MudTh>
             <MudTh>Дистанция</MudTh>
+            <MudTh>Класс</MudTh>
             <MudTh>Время</MudTh>
             <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Мак">@context.Mac</MudTd>
+            <MudTd DataLabel="Мак">@context.StudentName</MudTd>
             <MudTd DataLabel="Дистанция">@context.Distance</MudTd>
+            <MudTd DataLabel="Мак">@context.StudentClass</MudTd>
             <MudTd DataLabel="Время">@context.TimeStamp.ToString("dd-MM-yyyy HH:mm:ss")</MudTd>
-            <MudTd><MudButton Color="Color.Info" @onclick="@((e) => AddToClass(context))">Изменить</MudButton></MudTd>
+            <MudTd><MudButton Color="Color.Info" @onclick="@((e) => AddToClass(context))">Добавить</MudButton></MudTd>
         </RowTemplate>
     </MudTable>
 }
@@ -28,22 +30,64 @@ else
 {
     <MudProgressCircular Indeterminate="true"></MudProgressCircular>
 }
+@if (listOfStudentsInClass is not null && listOfStudentsInClass.Any())
+{
+    <MudTable Items="@listOfStudentsInClass" Hover="true" Class="my-5">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Зарегистрированы на урок</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Имя ученика</MudTh>
+            <MudTh>Дистанция</MudTh>
+            <MudTh>Класс</MudTh>
+            <MudTh>Время</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Мак">@context.StudentName</MudTd>
+            <MudTd DataLabel="Дистанция">@context.Distance</MudTd>
+            <MudTd DataLabel="Мак">@context.StudentClass</MudTd>
+            <MudTd DataLabel="Время">@context.TimeStamp.ToString("dd-MM-yyyy HH:mm:ss")</MudTd>
+            <MudTd><MudButton Color="Color.Info" @onclick="@((e) => RemoveFromClass(context))">Удалить</MudButton></MudTd>
+        </RowTemplate>
+    </MudTable>
 
+    @if (classroom is not null)
+    {
+
+    }
+}
+else
+{
+    <p>В классе еще нет учеников</p>
+}
 
 
 @code {
-    BeaconResponse[] beaconResponses;
+
     List<BeaconResponse> listOfBeacons;
+    List<BeaconResponse> listOfStudentsInClass = new();
+    Classroom classroom;
 
     protected override async Task OnInitializedAsync()
     {
-        beaconResponses = await httpClient.GetFromJsonAsync<BeaconResponse[]>("api/gateways/gw/77-88-99-00-11-22");
+        var beaconResponses = await httpClient.GetFromJsonAsync<BeaconResponse[]>("api/gateways/gw/77-88-99-00-11-22");
         listOfBeacons = beaconResponses.ToList();
+
+        classroom = await httpClient.GetFromJsonAsync<Classroom>("api/classrooms/number/202");
+
     }
 
     private void AddToClass(BeaconResponse context)
     {
         listOfBeacons.RemoveAll(x => x.Mac.Equals(context.Mac, StringComparison.InvariantCultureIgnoreCase));
+        listOfStudentsInClass.Add(context);
+    }
+
+    private void RemoveFromClass(BeaconResponse context)
+    {
+        listOfStudentsInClass.RemoveAll(x => x.Mac.Equals(context.Mac, StringComparison.InvariantCultureIgnoreCase));
+        listOfBeacons.Add(context);
     }
 
 }

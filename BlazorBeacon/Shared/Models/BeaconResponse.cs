@@ -13,5 +13,7 @@ namespace BlazorBeacon.Shared.Models
         public string GwTopic { get; set; }
         public string GwMac { get; set; }
         public DateTimeOffset TimeStamp { get; set; }
+        public string StudentName { get; set; }
+        public string StudentClass { get; set; }
     }
 }

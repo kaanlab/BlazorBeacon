@@ -23,7 +23,7 @@
         private void DoWork(object? state)
         {
             //var ar = new string[] { "FB-A7-DC-2C-E8-3E" };
-            Task.Run(async () => await _mqttClientService.GetGatewayDataByTopic("ppku"));
+            //Task.Run(async () => await _mqttClientService.GetGatewayDataByTopic("ppku"));
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
