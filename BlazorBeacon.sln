@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32408.312
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBeacon.Server", "BlazorBeacon\Server\BlazorBeacon.Server.csproj", "{D9C7941F-B42E-4BE9-B015-362BA9342B13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorBeacon.Server", "BlazorBeacon\Server\BlazorBeacon.Server.csproj", "{D9C7941F-B42E-4BE9-B015-362BA9342B13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBeacon.Client", "BlazorBeacon\Client\BlazorBeacon.Client.csproj", "{03814D54-9918-4B37-8D5B-1C9E78FDCF0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorBeacon.Client", "BlazorBeacon\Client\BlazorBeacon.Client.csproj", "{03814D54-9918-4B37-8D5B-1C9E78FDCF0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBeacon.Shared", "BlazorBeacon\Shared\BlazorBeacon.Shared.csproj", "{35D80D1F-237C-4C57-9FBD-25F75BD9D47D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorBeacon.Shared", "BlazorBeacon\Shared\BlazorBeacon.Shared.csproj", "{35D80D1F-237C-4C57-9FBD-25F75BD9D47D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
