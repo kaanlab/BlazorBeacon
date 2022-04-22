@@ -38,7 +38,9 @@ namespace BlazorBeacon.Server.Controllers
 
             //return Ok(ToBeaconResponseModel(beacons));
             List<CachedBeacon> cachedList = new List<CachedBeacon>();
-            var cachedBeacons = _cacheService.CachedBeacons; //GetBeacons();
+            //var cachedBeacons = _cacheService.CachedBeacons; 
+            // test data
+            var cachedBeacons = GetBeacons();
             var groupedBeacons = cachedBeacons.Where(x => x.GwMac.Equals(mac, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(x => x.TimeStamp).GroupBy(x => x.Mac).ToArray();
             foreach (var beacons in groupedBeacons)
             {
@@ -63,7 +65,9 @@ namespace BlazorBeacon.Server.Controllers
             //    .Take(10);
 
             //return Ok(ToBeaconResponseModel(beacons));
-            var cachedBeacons = _cacheService.CachedBeacons; // GetBeacons();
+            //var cachedBeacons = _cacheService.CachedBeacons;
+            //test data
+            var cachedBeacons = GetBeacons();            
             var filteredBeacons =  cachedBeacons.Where(x => x.Mac.Equals(mac, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(x => x.TimeStamp);
 
             var students = GetStudents();

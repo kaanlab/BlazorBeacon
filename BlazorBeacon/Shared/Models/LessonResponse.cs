@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace BlazorBeacon.Shared.Models
 {
-    public class Lesson
+    public class LessonResponse
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Topic { get; set; }
         public string TeacherName { get; set; }
-        public DateTimeOffset Time { get; set; }
+        public string Time { get; set; }
         public IEnumerable<Student> Students { get; set; }
     }
 }
