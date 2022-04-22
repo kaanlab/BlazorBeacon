@@ -15,18 +15,18 @@ namespace BlazorBeacon.Server.Controllers
         }
 
         [HttpGet("number/{number}")]
-        public ActionResult<ClassroomResponse> GetByNumber(string number)
+        public ActionResult<Classroom> GetByNumber(string number)
         {
             var classroom = GetClassrooms().FirstOrDefault(x => x.Cabinet.Equals(number, StringComparison.InvariantCultureIgnoreCase));
-            var classroomRespose = new ClassroomResponse()
-            {
-                Id = classroom.Id,
-                Cabinet = classroom.Cabinet,
-                Date = classroom.Date,
-                LessonsResponse = classroom.Lessons.ToLessonResponseModel()
-            };
+            //var classroomRespose = new ClassroomResponse()
+            //{
+            //    Id = classroom.Id,
+            //    Cabinet = classroom.Cabinet,
+            //    Date = classroom.Date,
+            //    LessonsResponse = classroom.Lessons.ToLessonResponseModel()
+            //};
 
-            return Ok(classroomRespose);
+            return Ok(classroom);
         }
 
         [HttpPost("add")]

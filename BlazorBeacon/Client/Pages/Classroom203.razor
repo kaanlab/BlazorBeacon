@@ -1,0 +1,52 @@
+﻿@page "/classroom203"
+@using BlazorBeacon.Client.Extensions
+
+@inject HttpClient httpClient
+
+<h3>classroom203</h3>
+@if (classroom is not null)
+{
+    <!-- Выбор занятия  -->
+    <MudSelect T="Lesson" @bind-Value="selectedLesson" Label="Выберите урок" AnchorOrigin="Origin.BottomCenter">
+        @foreach (var lesson in classroom.Lessons)
+        {
+            <MudSelectItem Value="@lesson">@lesson.Title в @lesson.Time</MudSelectItem>
+        }
+    </MudSelect>
+
+    if (selectedLesson is not null)
+    {
+        <!-- Название занятия  -->
+        <MudTextField T="string" Label="Название" @bind-Text="selectedLesson.Topic" ReadOnly=true />
+        <!-- Преподаватель  -->
+        <MudTextField T="string" Label="Название" @bind-Text="selectedLesson.TeacherName" ReadOnly=true />
+        <!-- Дата занятия  -->
+        <!--<MudTextField T="string" Label="Time" @bind-Text="selectedLesson.Time" InputType="InputType.Time" ReadOnly=true />-->
+        if (selectedLesson.Students is not null && selectedLesson.Students.Any())
+        {
+            foreach (var student in selectedLesson.Students)
+            {
+                <MudChip Color="Color.Primary">@student.Name - @student.Class</MudChip>
+            }
+        }
+    }
+}
+
+
+@code {
+
+    Classroom classroom;
+    Lesson selectedLesson;
+    List<BeaconResponse> listOfBeacons;
+
+    protected override async Task OnInitializedAsync()
+    {
+        classroom = await httpClient.GetFromJsonAsync<Classroom>("api/classrooms/number/202");
+        await Refresh();
+    }
+
+    private async Task Refresh()
+    {
+        listOfBeacons = (await httpClient.GetFromJsonAsync<BeaconResponse[]>("api/gateways/gw/8C-AA-B5-97-E1-FC")).ToList();
+    }
+}
