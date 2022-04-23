@@ -1,0 +1,131 @@
+﻿@page "/classroom/{ClassNumber}"
+@using BlazorBeacon.Client.Extensions
+
+@inject HttpClient httpClient
+
+@if (classroom is not null)
+{
+    <h3>Кабинет @classroom.Cabinet</h3>
+    <!-- Выбор занятия  -->
+    <MudSelect T="Lesson" @bind-Value="selectedLesson" Label="Выберите урок" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="@(async () => await Refresh())">
+        @foreach (var lesson in classroom.Lessons)
+        {
+            <MudSelectItem Value="@lesson">@lesson.Title в @lesson.Time.ToString("HH:mm")</MudSelectItem>
+        }
+    </MudSelect>
+
+    if (selectedLesson is not null)
+    {
+        <!-- Название занятия  -->
+        <MudTextField T="string" Label="Название" @bind-Text="selectedLesson.Topic" ReadOnly=true />
+        <!-- Преподаватель  -->
+        <MudTextField T="string" Label="Название" @bind-Text="selectedLesson.TeacherName" ReadOnly=true />
+        <!-- Дата занятия  -->
+        <!--<MudTextField T="string" Label="Time" @bind-Text="selectedLesson.Time" InputType="InputType.Time" ReadOnly=true />-->
+        if (selectedLesson.Students is not null && selectedLesson.Students.Any())
+        {
+            <MudTable Items="@selectedLesson.Students" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Class="mt-5">
+                <HeaderContent>
+                    <MudTh>Имя</MudTh>
+                    <MudTh>Класс</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Nr">@context.Name</MudTd>
+                    <MudTd DataLabel="Sign">@context.Class</MudTd>
+                    <MudTd><MudButton Color="Color.Info" @onclick="@(async (e) => await RemoveFromClass(context))">Удалить</MudButton></MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Warning" Class="mt-5">На занятие не зарегистрированно ни одного ученика</MudAlert>
+        }
+
+        @if (listOfBeacons is not null)
+        {
+            <MudTable Items="@listOfBeacons" Hover="true" Class="mt-5">
+                <ToolBarContent>
+                    <MudIconButton Icon="@Icons.Filled.Refresh" Color="Color.Primary" Size="Size.Large" OnClick="@(async () => await Refresh())" Class="mr-3" />
+                    <MudText Typo="Typo.h6">В ожидании</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Имя ученика</MudTh>
+                    <MudTh>Дистанция</MudTh>
+                    <MudTh>Класс</MudTh>
+                    <MudTh>Время</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Мак">@context.StudentName</MudTd>
+                    <MudTd DataLabel="Дистанция">
+                         @if (context.Distance <= 1)
+                        {
+                            <MudChip Disabled="true" Color="Color.Success"> @Math.Round(context.Distance, 2)</MudChip>
+                        }
+                        else
+                        {
+                            <MudChip> @Math.Round(context.Distance, 2)</MudChip>
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Мак">@context.StudentClass</MudTd>
+                    <MudTd DataLabel="Время">@context.TimeStamp.ToString("dd-MM-yyyy HH:mm:ss")</MudTd>
+                    <MudTd><MudButton Color="Color.Info" @onclick="@(async (e) => await AddToClass(context))">Добавить</MudButton></MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    }
+}
+
+
+@code {
+
+    [Parameter]
+    public string ClassNumber { get; set; } 
+
+    Classroom classroom;
+    Lesson selectedLesson;
+    List<BeaconResponse> listOfBeacons;
+    List<Student> students;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        selectedLesson = null;
+        classroom = await httpClient.GetFromJsonAsync<Classroom>($"api/classrooms/number/{ClassNumber}");
+        students = (await httpClient.GetFromJsonAsync<IEnumerable<Student>>("api/students/all")).ToList();
+        await Refresh();
+
+    }
+
+    private async Task Refresh()
+    {
+        var beacons = await httpClient.GetFromJsonAsync<BeaconResponse[]>($"api/gateways/gw/{classroom.GatewayMac}");
+        var draft = beacons.ToList();
+        if (selectedLesson is not null && selectedLesson.Students is not null && selectedLesson.Students.Any())
+        {
+            foreach (var student in selectedLesson.Students)
+            {
+                draft.RemoveAll(x => x.Mac.Equals(student.BeaconMac, StringComparison.InvariantCultureIgnoreCase));
+            }
+        }
+        listOfBeacons = draft;
+    }
+
+    private async Task RemoveFromClass(Student context)
+    {
+        selectedLesson.Students.Remove(context);
+        await Refresh();
+    }
+
+    private async Task AddToClass(BeaconResponse context)
+    {
+        listOfBeacons.RemoveAll(x => x.Mac.Equals(context.Mac, StringComparison.InvariantCultureIgnoreCase));
+        var student = students.FirstOrDefault(x => x.BeaconMac.Equals(context.Mac, StringComparison.InvariantCultureIgnoreCase));
+        if (selectedLesson.Students is null)
+        {
+            selectedLesson.Students = new List<Student>();
+        }
+        selectedLesson.Students.Add(student);
+        await Refresh();
+    }
+}

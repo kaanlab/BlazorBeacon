@@ -9,7 +9,7 @@ namespace BlazorBeacon.Shared.Models
     public class BeaconResponse
     {
         public string Mac { get; set; }
-        public string Distance { get; set; }
+        public double Distance { get; set; }
         public string GwTopic { get; set; }
         public string GwMac { get; set; }
         public DateTimeOffset TimeStamp { get; set; }

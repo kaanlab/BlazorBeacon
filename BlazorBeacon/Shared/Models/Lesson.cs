@@ -13,6 +13,6 @@ namespace BlazorBeacon.Shared.Models
         public string Topic { get; set; }
         public string TeacherName { get; set; }
         public DateTimeOffset Time { get; set; }
-        public IEnumerable<Student> Students { get; set; }
+        public List<Student> Students { get; set; }
     }
 }

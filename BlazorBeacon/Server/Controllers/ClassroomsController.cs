@@ -49,6 +49,7 @@ namespace BlazorBeacon.Server.Controllers
                     Id = 1,
                     Cabinet = "202",
                     Date = date,
+                    GatewayMac = "8C-AA-B5-97-E1-FC",
                     Lessons = new List<Lesson>()
                     {
                         new Lesson { Id = 1, Title = "Первый урок", Topic = "Математика", TeacherName = "Сидоров С.С.", Time = date.AddHours(-3) },
@@ -56,8 +57,8 @@ namespace BlazorBeacon.Server.Controllers
                         new Lesson { Id = 3, Title = "Третий урок", Topic = "Математика", TeacherName = "Сидоров С.С.", Time = date.AddHours(-1) },
                         new Lesson { Id = 4, Title = "Четвертый урок", Topic = "Математика", TeacherName = "Сидоров С.С.", Time = date, Students = new List<Student>()
                             {
-                                new Student { BeaconMac = "E9-E1-79-33-78-8F", Name = "Иванов И.И.", Class = "5А" },
-                                new Student { BeaconMac = "FE-BB-DE-77-08-D5", Name = "Петров П.П.", Class = "6Б" },
+                                new Student { Id = 1, BeaconMac = "E9-E1-79-33-78-8F", Name = "Иванов И.И.", Class = "5А" },
+                                new Student { Id = 2, BeaconMac = "FE-BB-DE-77-08-D5", Name = "Петров П.П.", Class = "6Б" },
                             }
                         }
                     }
@@ -67,6 +68,7 @@ namespace BlazorBeacon.Server.Controllers
                     Id = 2,
                     Cabinet = "250",
                     Date= date,
+                    GatewayMac = "C4-4F-33-6B-DD-99",
                     Lessons = new List<Lesson>()
                     {
                         new Lesson { Id = 5, Title = "Первый урок", Topic = "Русский язык", TeacherName = "Васечкин В.В.", Time = date.AddHours(-3) },

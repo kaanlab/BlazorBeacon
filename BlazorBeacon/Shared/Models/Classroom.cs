@@ -12,5 +12,6 @@ namespace BlazorBeacon.Shared.Models
         public string Cabinet { get; set; }
         public IEnumerable<Lesson> Lessons { get; set; }
         public DateTimeOffset Date { get; set; }
+        public string GatewayMac { get; set; }
     }
 }
