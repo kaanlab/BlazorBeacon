@@ -5,7 +5,8 @@
 
 @if (classroom is not null)
 {
-    <h3>Кабинет @classroom.Cabinet</h3>
+    <MudText Typo="Typo.h6" Align="Align.Right">Расписание на @classroom.Date.ToString("dd.MM.yyyy")</MudText>
+    <MudText Typo="Typo.h5">Кабинет @classroom.Cabinet</MudText>
     <!-- Выбор занятия  -->
     <MudSelect T="Lesson" @bind-Value="selectedLesson" Label="Выберите урок" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="@(async () => await Refresh())">
         @foreach (var lesson in classroom.Lessons)
@@ -17,16 +18,20 @@
     if (selectedLesson is not null)
     {
         <!-- Название занятия  -->
-        <MudTextField T="string" Label="Название" @bind-Text="selectedLesson.Topic" ReadOnly=true />
+        <MudTextField T="string" Label="Название предмета" @bind-Text="selectedLesson.Topic" ReadOnly=true />
         <!-- Преподаватель  -->
-        <MudTextField T="string" Label="Название" @bind-Text="selectedLesson.TeacherName" ReadOnly=true />
+        <MudTextField T="string" Label="Преподаватель" @bind-Text="selectedLesson.TeacherName" ReadOnly=true />
         <!-- Дата занятия  -->
         <!--<MudTextField T="string" Label="Time" @bind-Text="selectedLesson.Time" InputType="InputType.Time" ReadOnly=true />-->
         if (selectedLesson.Students is not null && selectedLesson.Students.Any())
         {
             <MudTable Items="@selectedLesson.Students" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Class="mt-5">
+                <ToolBarContent>
+                    <MudIcon Icon="@Icons.Material.Filled.MenuBook" Class="mr-3"/>
+                    <MudText Typo="Typo.h6">Классный журнал</MudText>
+                </ToolBarContent>
                 <HeaderContent>
-                    <MudTh>Имя</MudTh>
+                    <MudTh>Ученик</MudTh>
                     <MudTh>Класс</MudTh>
                     <MudTh></MudTh>
                 </HeaderContent>
@@ -39,7 +44,7 @@
         }
         else
         {
-            <MudAlert Severity="Severity.Warning" Class="mt-5">На занятие не зарегистрированно ни одного ученика</MudAlert>
+            <MudAlert Severity="Severity.Warning" Class="mt-5">На занятие не зарегистрированно ни одного ученика!</MudAlert>
         }
 
         @if (listOfBeacons is not null)
