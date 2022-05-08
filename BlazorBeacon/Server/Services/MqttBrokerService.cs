@@ -10,7 +10,7 @@ namespace BlazorBeacon.Server.Services
 {
     public class MqttBrokerService
     {
-        public static Gateway Gateway = null;
+        public static Dictionary<string, Gateway> Gateways = new Dictionary<string, Gateway>();
         private static IMqttServer mqttServer = null;
 
         public static async Task Start()
@@ -18,7 +18,7 @@ namespace BlazorBeacon.Server.Services
             // Create the options for our MQTT Broker
             MqttServerOptionsBuilder options = new MqttServerOptionsBuilder()
                                                  // set endpoint to localhost
-                                                 .WithDefaultEndpointBoundIPAddress(IPAddress.Parse("192.168.63.25"))
+                                                 .WithDefaultEndpointBoundIPAddress(IPAddress.Parse("10.0.0.10"))
                                                  // port used will be 707
                                                  .WithDefaultEndpointPort(1883)
                                                  // handler for new connections
@@ -66,7 +66,10 @@ namespace BlazorBeacon.Server.Services
                     });
                 }
 
-                Gateway = new Gateway
+
+                var key = context.ApplicationMessage.Topic;
+
+                var gateway = new Gateway
                 {
                     TimeStamp = DateTimeOffset.UtcNow,
                     Topic = context.ApplicationMessage.Topic,
@@ -76,6 +79,16 @@ namespace BlazorBeacon.Server.Services
                     Beacons = beacons
                 };
 
+                var isKeyExist = Gateways.TryGetValue(key, out _);
+
+                if(isKeyExist)
+                {
+                    Gateways[key] = gateway;
+                }
+                else
+                {
+                    Gateways.Add(key, gateway);
+                }
             }
         }
     }

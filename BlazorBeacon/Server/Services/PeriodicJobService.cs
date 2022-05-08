@@ -25,7 +25,7 @@ namespace BlazorBeacon.Server.Services
 
         private void DoWork(object? state)
         {
-            SaveToCache(MqttBrokerService.Gateway);            
+            SaveToCache(MqttBrokerService.Gateways);
 
             //Task.Run(async () => await _mqttClientService.GetGatewayDataByTopic("gp1/202"));
             //Task.Run(async () => await _mqttClientService.GetGatewayDataByTopic("gp1/250"));
@@ -38,20 +38,22 @@ namespace BlazorBeacon.Server.Services
             //return Task.CompletedTask;
         }
 
-        private void SaveToCache(Gateway gateway)
+        private void SaveToCache(Dictionary<string, Gateway> gateways)
         {
             _cacheService.CachedBeacons.Clear();
             var timeStamp = DateTimeOffset.Now;
-            while (_cacheService.CachedBeacons.Count < 6)
+
+            if (gateways is not null)
             {
-                if (gateway is not null && gateway.Beacons.Any())
+
+                foreach (var gate in gateways)
                 {
-                    foreach (var beacon in gateway.Beacons)
+                    foreach (var beacon in gate.Value.Beacons)
                     {
                         var distance = CalculateAccuracy(beacon.TxPower, beacon.Rssi);
                         if (_cacheService.CachedBeacons is not null)
                         {
-                            _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = timeStamp, Mac = beacon.Mac, Distance = distance, GwMac = gateway.Mac, GwTopic = gateway.Topic });
+                            _cacheService.CachedBeacons.Add(new CachedBeacon { TimeStamp = timeStamp, Mac = beacon.Mac, Distance = distance, GwMac = gate.Value.Mac, GwTopic = gate.Value.Topic });
                         }
                     }
                 }
