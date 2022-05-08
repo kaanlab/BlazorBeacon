@@ -1,4 +1,5 @@
 ﻿using BlazorBeacon.Server.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BlazorBeacon.Server.Services
 {

@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<ICacheService, CacheService>();
-builder.Services.AddSingleton<IMqttClientService, MqttClientService>();
+//builder.Services.AddSingleton<IMqttClientService, MqttClientService>();
 builder.Services.AddHostedService<PeriodicJobService>();
 
 var app = builder.Build();

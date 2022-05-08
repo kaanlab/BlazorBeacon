@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace BlazorBeacon.Server.Models
 {
-    public class Beacon
+    public record struct Beacon
     {
-        public string Adv { get; set; }
-        public string Mac { get; set; }
-        public int Rssi { get; set; }
-        public string Uuid { get; set; }
-        public string Major { get; set; }
-        public string Minor { get; set; }
-        public int TxPower { get; set; }
+        public string Adv { get; init; }
+        public string Mac { get; init; }
+        public int Rssi { get; init; }
+        public string Uuid { get; init; }
+        public string Major { get; init; }
+        public string Minor { get; init; }
+        public int TxPower { get; init; }
     }
 }

@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace BlazorBeacon.Server.Models
 {
     [MessagePackObject(keyAsPropertyName: true)]
-    public class MpGateway
+    public record MpGateway
     {
-        public string v { get; set; }
-        public int mid { get; set; }
-        public int time { get; set; }
-        public string ip { get; set; }
-        public string mac { get; set; }
-        public IEnumerable<byte[]> devices { get; set; }
+        public string v { get; init; }
+        public int mid { get; init; }
+        public int time { get; init; }
+        public string ip { get; init; }
+        public string mac { get; init; }
+        public IEnumerable<byte[]> devices { get; init; }
     }
 }

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace BlazorBeacon.Server.Models
 {
-    public class Gateway
+    public record Gateway
     {
-        public DateTimeOffset TimeStamp { get; set; }
-        public string Topic { get; set; }
-        public string Version { get; set; }
-        public string Ip { get; set; }
-        public string Mac { get; set; }
-        public IEnumerable<Beacon> Beacons { get; set; }
+        public DateTimeOffset TimeStamp { get; init; }
+        public string Topic { get; init; }
+        public string Version { get; init;  }
+        public string Ip { get; init; }
+        public string Mac { get; init; }
+        public IEnumerable<Beacon> Beacons { get; init; }
     }
 }
